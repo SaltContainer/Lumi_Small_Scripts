@@ -87,14 +87,14 @@ def add_honey_tree_encounters(encs, dist):
 
         new_encs = sorted_encs[i]
 
-        clear_in_distributions(poke_d_dun, "HoneyTree")
-        if dupe_to_pearl: clear_in_distributions(poke_p_dun, "HoneyTree")
+        clear_in_distributions(poke_d, "HoneyTree")
+        if dupe_to_pearl: clear_in_distributions(poke_p, "HoneyTree")
 
         for (enc_type, chunk) in new_encs:
             # Honey Tree encounters
             if enc_type == "honey":
-                insert_zone_in_distributions(poke_d_dun, "HoneyTree", chunk)
-                if dupe_to_pearl: insert_zone_in_distributions(poke_p_dun, "HoneyTree", chunk)
+                insert_zone_in_distributions(poke_d, "HoneyTree", chunk)
+                if dupe_to_pearl: insert_zone_in_distributions(poke_p, "HoneyTree", chunk)
         
         fill_empty_distributions(poke_d)
         fill_empty_distributions(poke_d_dun)
