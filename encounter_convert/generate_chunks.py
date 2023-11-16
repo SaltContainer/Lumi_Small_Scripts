@@ -2,7 +2,8 @@
 # - 0 IS AN EMPTY ZONE
 # - 1-892 ARE EACH INDIVIDUAL MAP CHUNKS
 # - 893+ ARE EACH ZONEID
-# USE THIS TO ALLOW THE encount_convert.py SCRIPT TO PROPERLY ASSIGN MAP ZONES TO ENCOUNTERS
+# THE ZONEID-BASED MAP ZONES WILL NEED MANUAL WORK TO BE ON THE PROPER CHUNKS.
+# USE THIS TO ALLOW THE encount_convert.py SCRIPT TO PROPERLY ASSIGN MAP ZONES TO ENCOUNTERS.
 
 import json
 import copy
@@ -132,13 +133,6 @@ def generate_data(dist):
             new_dist["MapDistribution"][id]["LightUpGridXZ"][0]["y"] = y
     return new_dist
 
-def fix_x(dist):
-    for map in range(1550):
-        for xz in dist["MapDistribution"][map]["LightUpGridXZ"]:
-            if xz["x"] != -1 or xz["y"] != -1:
-                xz["x"] = xz["x"] + 1
-    return dist
-
 distribution = load_distribution_file(dt_path)
-new_distribution = fix_x(distribution)
+new_distribution = generate_data(distribution)
 output_distribution(out_path, new_distribution)
