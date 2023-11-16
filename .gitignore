@@ -1,1 +1,4 @@
 *.json
+input/
+output/
+__pycache__/
