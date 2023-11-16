@@ -9,6 +9,9 @@ dt_path = 'DistributionTable.json'
 out_path = 'DistributionTable_out.json'
 
 gba_on = True
+clear_distributions = True
+clear_dun_distributions = True
+dupe_to_pearl = True
 dexsize = 1017
 mapchunks = 891
 
@@ -106,6 +109,9 @@ def fill_empty_distributions(d):
         if len(category) == 0:
             category.append(-1)
 
+def clear_in_distributions(d, field):
+    d[field] = []
+
 def convert_encounters(encs, dist):
     sorted_encs = sort_encounters_by_poke(encs)
     new_dist = copy.deepcopy(dist)
@@ -116,7 +122,17 @@ def convert_encounters(encs, dist):
     new_dist["Pearl_DungeonTable"] = pad_or_truncate(new_dist["Pearl_DungeonTable"], dexsize+1)
 
     for i in range(dexsize+1):
-        new_dist["Diamond_FieldTable"][i] = empty_distribution()
+        if clear_distributions:
+            new_dist["Diamond_FieldTable"][i] = empty_distribution()
+        
+        if clear_dun_distributions:
+            new_dist["Diamond_DungeonTable"][i] = empty_distribution()
+
+        if clear_distributions and dupe_to_pearl:
+            new_dist["Pearl_FieldTable"][i] = empty_distribution()
+        
+        if clear_dun_distributions and dupe_to_pearl:
+            new_dist["Pearl_DungeonTable"][i] = empty_distribution()
 
         poke_d = new_dist["Diamond_FieldTable"][i]
         poke_d_dun = new_dist["Diamond_DungeonTable"][i]
@@ -126,48 +142,75 @@ def convert_encounters(encs, dist):
         new_encs = sorted_encs[i]
 
         for (enc_type, zone) in new_encs:
-            # Regular grass/cave and water
-            if enc_type == "ground" or enc_type == "water":
-                insert_zone_in_distributions(poke_d, "BeforeMorning", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterMorning", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "BeforeDaytime", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterDaytime", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "BeforeNight", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterNight", convert_zone_id(zone))
-            # Morning only
-            elif enc_type == "morning":
-                insert_zone_in_distributions(poke_d, "BeforeMorning", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterMorning", convert_zone_id(zone))
-            # Mid-day only
-            elif enc_type == "day":
-                insert_zone_in_distributions(poke_d, "BeforeDaytime", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterDaytime", convert_zone_id(zone))
-            # Night only
-            elif enc_type == "night":
-                insert_zone_in_distributions(poke_d, "BeforeNight", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterNight", convert_zone_id(zone))
-            # Swarm
-            elif enc_type == "tairyo":
-                insert_zone_in_distributions(poke_d, "BeforeMorning", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterMorning", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "BeforeDaytime", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterDaytime", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "BeforeNight", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterNight", convert_zone_id(zone))
-            # Poké Radar
-            elif enc_type == "swayGrass":
-                insert_zone_in_distributions(poke_d, "PokemonTraser", convert_zone_id(zone))
-            # GBA Slots
-            elif gba_on and (enc_type == "gbaRuby" or enc_type == "gbaSapp" or enc_type == "gbaEme" or enc_type == "gbaFire" or enc_type == "gbaLeaf"):
-                insert_zone_in_distributions(poke_d, "BeforeMorning", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterMorning", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "BeforeDaytime", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterDaytime", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "BeforeNight", convert_zone_id(zone))
-                insert_zone_in_distributions(poke_d, "AfterNight", convert_zone_id(zone))
-            # Fishing
-            elif enc_type == "boro" or enc_type == "ii" or enc_type == "sugoi":
-                insert_zone_in_distributions(poke_d, "Fishing", convert_zone_id(zone))
+            if zone > 0:
+                # Regular grass/cave and water
+                if enc_type == "ground" or enc_type == "water":
+                    insert_zone_in_distributions(poke_d, "BeforeMorning", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeMorning", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterMorning", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterMorning", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "BeforeDaytime", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeDaytime", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterDaytime", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterDaytime", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "BeforeNight", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeNight", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterNight", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterNight", convert_zone_id(zone))
+                # Morning only
+                elif enc_type == "morning":
+                    insert_zone_in_distributions(poke_d, "BeforeMorning", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeMorning", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterMorning", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterMorning", convert_zone_id(zone))
+                # Mid-day only
+                elif enc_type == "day":
+                    insert_zone_in_distributions(poke_d, "BeforeDaytime", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeDaytime", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterDaytime", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterDaytime", convert_zone_id(zone))
+                # Night only
+                elif enc_type == "night":
+                    insert_zone_in_distributions(poke_d, "BeforeNight", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeNight", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterNight", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterNight", convert_zone_id(zone))
+                # Swarm
+                elif enc_type == "tairyo":
+                    insert_zone_in_distributions(poke_d, "BeforeMorning", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeMorning", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterMorning", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterMorning", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "BeforeDaytime", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeDaytime", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterDaytime", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterDaytime", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "BeforeNight", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeNight", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterNight", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterNight", convert_zone_id(zone))
+                # Poké Radar
+                elif enc_type == "swayGrass":
+                    insert_zone_in_distributions(poke_d, "PokemonTraser", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "PokemonTraser", convert_zone_id(zone))
+                # GBA Slots
+                elif gba_on and (enc_type == "gbaRuby" or enc_type == "gbaSapp" or enc_type == "gbaEme" or enc_type == "gbaFire" or enc_type == "gbaLeaf"):
+                    insert_zone_in_distributions(poke_d, "BeforeMorning", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeMorning", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterMorning", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterMorning", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "BeforeDaytime", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeDaytime", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterDaytime", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterDaytime", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "BeforeNight", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "BeforeNight", convert_zone_id(zone))
+                    insert_zone_in_distributions(poke_d, "AfterNight", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "AfterNight", convert_zone_id(zone))
+                # Fishing
+                elif enc_type == "boro" or enc_type == "ii" or enc_type == "sugoi":
+                    insert_zone_in_distributions(poke_d, "Fishing", convert_zone_id(zone))
+                    if dupe_to_pearl: insert_zone_in_distributions(poke_p, "Fishing", convert_zone_id(zone))
         
         fill_empty_distributions(poke_d)
         fill_empty_distributions(poke_d_dun)
