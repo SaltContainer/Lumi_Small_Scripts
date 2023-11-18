@@ -12,7 +12,6 @@ dupe_to_pearl = True
 dexsize = 1017
 
 hardcoded_chunks = [
-    [ 197, 56 ],
     [ 197, 571 ],
     [ 199, 471 ],
     [ 201, 502 ],
