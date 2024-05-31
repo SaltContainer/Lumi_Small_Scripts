@@ -1,5 +1,6 @@
 # THIS SCRIPT ADDS PLACEHOLDER LABELS BY COMPARING A BDSP LABEL FILE TO ANOTHER.
 # USE THIS TO PREPARE LANGUAGE BUNDLES FOR LATER TRANSLATING.
+# IMPORTANT NOTE: THE INDICES ON x_ss_btl_attack HAVE TO BE FIXED AFTER.
 
 import json
 import copy
@@ -48,7 +49,7 @@ def copy_label(input, output):
     output["tagDataArray"] = input["tagDataArray"]
     output["wordDataArray"] = input["wordDataArray"]
 
-def loop_through_data(src_data, dest_data, renamed_list, changed_list):
+def loop_through_data(src_data, dest_data, renamed_list, changed_list, filename):
     output_data = copy.deepcopy(src_data)
 
     copy_header(dest_data, output_data)
@@ -71,7 +72,11 @@ def loop_through_data(src_data, dest_data, renamed_list, changed_list):
             # Don't copy and just skip entry, we keep this changed English label as placeholder
             src_idx += 1
             dest_idx += 1
-        # Different label name, so must be an insert
+        # Random empty entry in the middle (for ss_btl_attack)
+        elif dest_data["labelDataArray"][dest_idx]["labelName"] == "" and filename == "ss_btl_attack":
+            # Don't copy and just skip entry, we keep this changed English label as placeholder it's fine
+            src_idx += 1
+            dest_idx += 1
         else:
             # Don't copy and just increment src, we keep this new English entry as placeholder
             src_idx += 1
@@ -97,7 +102,7 @@ def add_placeholder(src_path, dest_path, output_path, renamed_path, changed_path
     if filename in changed_data:
         changed_list = changed_data[filename]
 
-    output_data = loop_through_data(src_data, dest_data, renamed_list, changed_list)
+    output_data = loop_through_data(src_data, dest_data, renamed_list, changed_list, filename)
 
     json.dump(output_data, outputs[0], ensure_ascii=False, indent=4)
     close_files([inputs[0], inputs[1], outputs[0]])
