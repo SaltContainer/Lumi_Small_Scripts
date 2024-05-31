@@ -6,10 +6,9 @@ import copy
 
 from os import listdir
 from os.path import isfile, join
-from utils.str_calc import calculate, loadKey
 
 src_lang = "english"
-dest_lang = "french"
+dest_lang = "trad_chinese"
 
 changed_list_file = "changed.json"
 renamed_list_file = "renamed.json"
@@ -110,5 +109,4 @@ def add_placeholders_of_all_files(src_language, dest_language):
             filename = file.split('_', 1)[1]
             add_placeholder(src_language + "_" + filename, dest_language + "_" + filename, dest_language + "_" + filename, renamed_list_file, changed_list_file)
 
-loadKey()
 add_placeholders_of_all_files(src_lang, dest_lang)
