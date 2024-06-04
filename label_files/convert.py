@@ -16,10 +16,11 @@ style_color_index_column = 4
 style_font_size_column = 5
 style_max_width_column = 6
 style_control_id_column = 7
+attributes_column = 8
 
-general_columns_count = 8
-tag_columns_start = 8
-tag_columns_count = 7
+general_columns_count = 9
+tag_columns_start = 9
+tag_columns_count = 8
 
 tag_tag_index_column = 0
 tag_group_id_column = 1
@@ -27,10 +28,11 @@ tag_tag_id_column = 2
 tag_pattern_id_column = 3
 tag_force_article_column = 4
 tag_tag_param_column = 5
-tag_force_grammar_id_column = 6
+tag_tag_word_array_column = 6
+tag_force_grammar_id_column = 7
 
-label_file = "english_ss_btl_set.json"
-csv_file = "output_set.csv"
+label_file = "german_dp_scenario1.json"
+csv_file = "newdata_german.csv"
 
 text_regex = re.compile("([^\{\}]+|{tag:\d+}|{(?:wait|callback):\d+(?:\.\d+)?:(?:[^\{\}]+|{tag:\d+})?}|{pageend:(?:[^\{\}]+)?}\n)")
 
@@ -44,9 +46,9 @@ placeholder_label_file = {
         "m_FileID": 0,
         "m_PathID": 3652094840918934080
     },
-    "m_Name": "english_ss_btl_std",
-    "hash": -1604862815,
-    "langID": 2,
+    "m_Name": "german_dp_scenario1",
+    "hash": -1816719664,
+    "langID": 5,
     "isResident": 0,
     "isKanji": 0,
     "labelDataArray": []
@@ -130,6 +132,7 @@ def convert_item_to_csv(item):
     new_row[style_font_size_column] = item["styleInfo"]["fontSize"]
     new_row[style_max_width_column] = item["styleInfo"]["maxWidth"]
     new_row[style_control_id_column] = item["styleInfo"]["controlID"]
+    new_row[attributes_column] = "\n".join([str(x) for x in item["attributeValueArray"]])
 
     words = []
     for word in item["wordDataArray"]:
@@ -166,6 +169,7 @@ def convert_item_to_csv(item):
         new_row[tag_start + tag_pattern_id_column] = tag["tagPatternID"]
         new_row[tag_start + tag_force_article_column] = tag["forceArticle"]
         new_row[tag_start + tag_tag_param_column] = tag["tagParameter"]
+        new_row[tag_start + tag_tag_word_array_column] = "\n".join(tag["tagWordArray"])
         new_row[tag_start + tag_force_grammar_id_column] = tag["forceGrmID"]
     
     return new_row
@@ -188,6 +192,7 @@ def convert_item_to_json(row):
         new_tag["tagPatternID"] = int(row[index + tag_pattern_id_column])
         new_tag["forceArticle"] = int(row[index + tag_force_article_column])
         new_tag["tagParameter"] = int(row[index + tag_tag_param_column])
+        new_tag["tagWordArray"] = row[index + tag_tag_word_array_column].split("\n")
         new_tag["forceGrmID"] = int(row[index + tag_force_grammar_id_column])
 
         new_item["tagDataArray"].append(new_tag)
@@ -267,6 +272,8 @@ def convert_item_to_json(row):
     new_item["styleInfo"]["fontSize"] = int(row[style_font_size_column])
     new_item["styleInfo"]["maxWidth"] = int(row[style_max_width_column])
     new_item["styleInfo"]["controlID"] = int(row[style_control_id_column])
+
+    new_item["attributeValueArray"] = row[attributes_column].split("\n")
 
     return new_item
 
