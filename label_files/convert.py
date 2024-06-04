@@ -122,7 +122,7 @@ def close_files(files):
     for file in files:
         file.close()
 
-def convert_item_to_csv(item):
+def convert_item_to_csv(item, id):
     new_row = [0] * general_columns_count
 
     new_row[id_column] = item["labelIndex"]
@@ -174,11 +174,11 @@ def convert_item_to_csv(item):
     
     return new_row
 
-def convert_item_to_json(row):
+def convert_item_to_json(row, id):
     new_item = copy.deepcopy(placeholder_item)
 
     new_item["labelIndex"] = int(row[id_column])
-    new_item["arrayIndex"] = int(row[id_column])
+    new_item["arrayIndex"] = id
     new_item["labelName"] = row[name_column]
     
     i = 0
@@ -192,7 +192,10 @@ def convert_item_to_json(row):
         new_tag["tagPatternID"] = int(row[index + tag_pattern_id_column])
         new_tag["forceArticle"] = int(row[index + tag_force_article_column])
         new_tag["tagParameter"] = int(row[index + tag_tag_param_column])
-        new_tag["tagWordArray"] = row[index + tag_tag_word_array_column].split("\n")
+        if (row[index + tag_tag_word_array_column] == ""):
+            new_tag["tagWordArray"] = []
+        else:
+            new_tag["tagWordArray"] = row[index + tag_tag_word_array_column].split("\n")
         new_tag["forceGrmID"] = int(row[index + tag_force_grammar_id_column])
 
         new_item["tagDataArray"].append(new_tag)
@@ -273,7 +276,10 @@ def convert_item_to_json(row):
     new_item["styleInfo"]["maxWidth"] = int(row[style_max_width_column])
     new_item["styleInfo"]["controlID"] = int(row[style_control_id_column])
 
-    new_item["attributeValueArray"] = row[attributes_column].split("\n")
+    if row[attributes_column] == "":
+        new_item["attributeValueArray"] = []
+    else:
+        new_item["attributeValueArray"] = [int(x) for x in row[attributes_column].split("\n")]
 
     return new_item
 
@@ -283,8 +289,8 @@ def convert_to_csv(json_input_path, csv_output_path):
     json_data = json.load(inputs[0])
     csv_writer = csv.writer(outputs[0], delimiter=',')
 
-    for item in json_data['labelDataArray']:
-        new_row = convert_item_to_csv(item)
+    for (i, item) in enumerate(json_data['labelDataArray']):
+        new_row = convert_item_to_csv(item, i)
         csv_writer.writerow(new_row)
     
     close_files([inputs[0], outputs[0]])
@@ -295,8 +301,8 @@ def convert_to_json(csv_input_path, json_output_path):
     csv_reader = csv.reader(inputs[0], delimiter=',')
     json_data = copy.deepcopy(placeholder_label_file)
     
-    for row in csv_reader:
-        new_item = convert_item_to_json(row)
+    for (i, row) in enumerate(csv_reader):
+        new_item = convert_item_to_json(row, i)
         json_data['labelDataArray'].append(new_item)
                 
     json.dump(json_data, outputs[0], ensure_ascii=False, indent=4)
@@ -304,5 +310,5 @@ def convert_to_json(csv_input_path, json_output_path):
 
 
 loadKey()
-convert_to_csv(label_file, csv_file)
-#convert_to_json(csv_file, label_file)
+#convert_to_csv(label_file, csv_file)
+convert_to_json(csv_file, label_file)
