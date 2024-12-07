@@ -31,8 +31,8 @@ tag_tag_param_column = 5
 tag_tag_word_array_column = 6
 tag_force_grammar_id_column = 7
 
-label_file = "german_dp_scenario1.json"
-csv_file = "newdata_german.csv"
+label_file = "english_ss_option.json"
+csv_file = "new_ss_options.csv"
 
 text_regex = re.compile("([^\{\}]+|{tag:\d+}|{(?:wait|callback):\d+(?:\.\d+)?:(?:[^\{\}]+|{tag:\d+})?}|{pageend:(?:[^\{\}]+)?}\n)")
 
